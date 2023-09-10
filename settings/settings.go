@@ -4,7 +4,7 @@ import "github.com/veandco/go-sdl2/sdl"
 
 const (
 	WINDOW_TITLE              string  = "Aeros"
-	FPS                       int   = 60
+	FPS                       int     = 60
 	INITIAL_SCREEN_POSITION_X int32   = sdl.WINDOWPOS_UNDEFINED
 	INITIAL_SCREEN_POSITION_Y int32   = sdl.WINDOWPOS_UNDEFINED
 	SCREEN_SIZE_X             int32   = 800
@@ -15,4 +15,5 @@ const (
 	PLAYER_START_POSITION_X   int32   = 0
 	PLAYER_START_POSITION_Y   int32   = 0
 	PLAYER_SPEED              float64 = 1
+	BACKGROUND                string  = "sprites/honey.jpg"
 )

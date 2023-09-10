@@ -9,6 +9,7 @@ import (
 )
 
 type Player struct {
+	Name    string
 	Texture *sdl.Texture
 	Posx    float64 
 	Posy    float64
@@ -16,15 +17,15 @@ type Player struct {
 
 var count int8 = 0
 
-func NewPlayer(imagePath string, renderer *sdl.Renderer) (Player) {
+func NewPlayer(name, imagePath string, renderer *sdl.Renderer) (Player) {
 	texture := createPlayerTexture(imagePath, renderer)
-	return Player{Texture: texture}
+	return Player{Name: name, Texture: texture}
 }
 
-func NewPlayerOnline(imagePath string, posx, posy float64, renderer *sdl.Renderer) (*Player) {
+func NewPlayerOnline(name, imagePath string, posx, posy float64, renderer *sdl.Renderer) (*Player) {
 	fmt.Println("Criando jogador com as seguintes posicoes ", posx, posy)
 	texture := createPlayerTexture(imagePath, renderer)
-	return &Player{Texture: texture, Posx: posx, Posy: posy}
+	return &Player{Name: name, Texture: texture, Posx: posx, Posy: posy}
 }
 
 // createPlayerTexture textures are most performatics

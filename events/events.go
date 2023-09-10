@@ -3,7 +3,6 @@ package events
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"time"
 )
 
 var response string
@@ -28,7 +27,7 @@ func PubAndRecv(playerName string, posx, posy float64) string{
 	opts.SetUsername("emqx")
 	opts.SetPassword("public")
 	opts.SetDefaultPublishHandler(messagePubHandler)
-	opts.SetPingTimeout(60 * time.Second)
+	//opts.SetPingTimeout(60 * time.Second)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	client := mqtt.NewClient(opts)
@@ -47,11 +46,8 @@ func PubAndRecv(playerName string, posx, posy float64) string{
 }
 
 func publish(client mqtt.Client, message string) {
-	for i := 0; i < 10; i++{
-		token := client.Publish("topic/test", 0, false, message)
-		token.Wait()
-		time.Sleep(time.Second)
-	}
+	token := client.Publish("topic/test", 0, false, message)
+	token.Wait()
 
 }
 
