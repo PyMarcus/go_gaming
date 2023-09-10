@@ -1,8 +1,16 @@
 package main
 
-import "github.com/PyMarcus/go_gaming/source"
+import (
+	"fmt"
+	"github.com/PyMarcus/go_gaming/source"
+)
 
 
 func main() {
-	source.PlayGame()
+	var name string
+	
+	fmt.Print("Player name: ")
+	fmt.Scanf("%s", &name)
+
+	source.PlayGame(name)
 }

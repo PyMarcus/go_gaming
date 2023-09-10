@@ -3,14 +3,20 @@ package source
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
+	"github.com/PyMarcus/go_gaming/events"
 	"github.com/PyMarcus/go_gaming/objects"
 	"github.com/PyMarcus/go_gaming/settings"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+var playerManager = make(map[string]*objects.Player)
+
 // PlayGame starts the game and settings of screen
-func PlayGame() {
+func PlayGame(playerName string) {
 	// screen settings
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		fmt.Fprintf(os.Stderr, "Erro ao inicializar SDL: %v\n", err)
@@ -42,26 +48,56 @@ func PlayGame() {
 
 	// game
 
-	keepRunningGameWindow(renderer)
+	keepRunningGameWindow(playerName, renderer)
 
 	os.Exit(0)
 }
 
 // keepGameWindow keeps the window on load
-func keepRunningGameWindow(renderer *sdl.Renderer) {
+func keepRunningGameWindow(playerName string, renderer *sdl.Renderer) {
 	for {
+		frameStartTime := time.Now()
 
 		if !closeWindow() {
 			return
 		}
 
 		renderer.Clear()
-		player := objects.NewPlayer(settings.PLAYER_IMAGE_PATH, renderer)
-		player.Draw(renderer)
+		delta := int(time.Since(frameStartTime).Seconds()) * settings.FPS
+
+		currentPlayer, found := playerManager[playerName]
+
+		if !found {
+			playerManager[playerName] = objects.NewPlayerOnline(settings.PLAYER_IMAGE_PATH, 0, 0, renderer)
+			currentPlayer = playerManager[playerName]
+		}
+		name, px, py := mqtt(playerName, currentPlayer.Posx, currentPlayer.Posy)
+
+		if name != playerName {
+			newPlayer, found := playerManager[name]
+			if !found {
+				newPlayer = objects.NewPlayerOnline(settings.PLAYER_IMAGE_PATH, px, py, renderer)
+				playerManager[name] = newPlayer
+			}
+
+			/*
+			playerName = name
+			delete(playerManager, playerName)
+			currentPlayer = newPlayer
+			*/
+		}
+		
+		fmt.Println("A renderizar ", len(playerManager), playerManager)
+
+		// Renderize todos os jogadores
+		for _, player := range playerManager {
+			player.Draw(renderer, delta)
+		}
 
 		renderer.Present()
 	}
 }
+
 
 // closeWindow closes the main window
 func closeWindow() bool {
@@ -72,4 +108,19 @@ func closeWindow() bool {
 		}
 	}
 	return true
+}
+
+func mqtt(playerName string, posx, posy float64) (string, float64, float64){
+	response := events.PubAndRecv(playerName, posx, posy)
+	received := strings.Split(response, ":")
+	name := received[0]
+	if len(received) > 2{
+		fmt.Println("ok")
+		posxx := received[1]
+		posyy := received[2]
+		x, _ := strconv.ParseFloat(posxx, 64)
+		y, _ := strconv.ParseFloat(posyy, 64)
+		return name, x, y
+	}
+	return "ausente", 0.0, 0.0
 }
