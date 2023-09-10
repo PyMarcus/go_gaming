@@ -89,7 +89,6 @@ func keepRunningGameWindow(playerName string, renderer *sdl.Renderer) {
 		
 		fmt.Println("A renderizar ", len(playerManager), playerManager)
 
-		// Renderize todos os jogadores
 		for _, player := range playerManager {
 			player.Draw(renderer, delta)
 		}
